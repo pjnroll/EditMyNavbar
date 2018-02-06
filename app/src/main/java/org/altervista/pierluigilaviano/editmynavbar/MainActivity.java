@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
@@ -24,6 +25,15 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import eu.janmuller.android.simplecropimage.CropImage;
+
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
 
@@ -37,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
 
     WindowManager wm;
     DisplayMetrics displayMetrics;
+    File mFileTemp;
 
     private Uri uri;
 
@@ -124,11 +135,26 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == GALLERY_REQ_CODE) {
-            if (data != null) {
+            //  old code
+            /*if (data != null) {
                 uri = data.getData();
                 cropImage();
+            }*/
+
+            mFileTemp = new File(getFilesDir(), "temp_photo.png");
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                FileOutputStream fileOutputStream = new FileOutputStream(mFileTemp);
+                copyStream(inputStream, fileOutputStream);
+                fileOutputStream.close();
+                assert inputStream != null;
+                inputStream.close();
+
+                startCropImage();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } else if (requestCode == CROP_REQ_CODE) {
+        } /*else if (requestCode == CROP_REQ_CODE) {
             if (data != null) {
                 Bundle bundle = data.getExtras();
                 assert bundle != null;
@@ -137,7 +163,41 @@ public class MainActivity extends AppCompatActivity {
                 Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
                 bitmapIntent.putExtra("image", bitmap);
                 startService(bitmapIntent);
+            }*/
+        else if (requestCode == 0x3) {
+            String path = data.getStringExtra(CropImage.IMAGE_PATH);
+            if (path == null) {
+
+                return;
             }
+            Bitmap bitmap;
+            bitmap = BitmapFactory.decodeFile(mFileTemp.getPath());
+            imageView.setImageBitmap(bitmap);
+            Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
+            bitmapIntent.putExtra("image", bitmap);
+            startService(bitmapIntent);
+        }
+    }
+
+    private void startCropImage() {
+        int navbarW = displayMetrics.widthPixels;
+        int navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
+
+        Intent intent = new Intent(this, CropImage.class);
+        intent.putExtra(CropImage.IMAGE_PATH, mFileTemp.getPath());
+        intent.putExtra(CropImage.SCALE, true);
+
+        intent.putExtra(CropImage.ASPECT_X, navbarW);
+        intent.putExtra(CropImage.ASPECT_Y, navbarH);
+
+        startActivityForResult(intent, 0x3);
+    }
+
+    public static void copyStream(InputStream input, OutputStream output) throws IOException {
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
         }
     }
 

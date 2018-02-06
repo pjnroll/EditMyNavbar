@@ -7,4 +7,6 @@
     <string name="text_permission_granted_restart_service">Permission granted. You should restart EditMyNavbarService now.</string>
     <string name="text_button">GO</string>
     <string name="imgDesc">Navbar Backgroud</string>
+    <string name="text_choose_image">Choose an image from the gallery</string>
+    <string name="choose">Choose</string>
 </resources>

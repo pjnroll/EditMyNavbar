@@ -2,32 +2,26 @@ package org.altervista.pierluigilaviano.editmynavbar;
 
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.ColorFilter;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
-import android.view.KeyCharacterMap;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.ViewConfiguration;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import java.io.File;
+import java.io.IOException;
 
 public class EditMyNavbarService extends AccessibilityService {
     private final static String TAG = "EditMyNavbarService";
@@ -35,14 +29,18 @@ public class EditMyNavbarService extends AccessibilityService {
     private WindowManager wm;
     private LinearLayout mLayout;
     private ImageView imageView;
+    private Bitmap bmpProva;
     private DisplayMetrics displayMetrics;
 
+    private TextView txtUrl;
+    String url;
 
     private boolean visible;
 
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
         info.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
 
@@ -75,13 +73,24 @@ public class EditMyNavbarService extends AccessibilityService {
         LayoutInflater inflater = LayoutInflater.from(this);
         inflater.inflate(R.layout.view_navbar, mLayout);
 
-        imageView = mLayout.findViewById(R.id.imageView);
+        imageView = mLayout.findViewById(R.id.imgNavbar);
         //imageView.setImageResource(R.drawable.debug);
         Bitmap toAdd = getImg(displayMetrics.widthPixels, navbarHeight);
         imageView.setImageBitmap(toAdd);
         wm.addView(mLayout, lpNavView);
 
         visible = true;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null) {
+            if (intent.getParcelableExtra("image") != null) {
+                bmpProva = intent.getParcelableExtra("image");
+            }
+        }
+
+        return START_NOT_STICKY;
     }
 
     private Bitmap getImg(int width, int height) {
@@ -92,7 +101,6 @@ public class EditMyNavbarService extends AccessibilityService {
 
         int minW = getDrawable(R.drawable.bg_camo).getMinimumWidth();
         int minH = getDrawable(R.drawable.bg_camo).getMinimumHeight();
-        int minH = dImage.getMinimumHeight();
         int intW = getDrawable(R.drawable.bg_camo).getIntrinsicWidth();
         int intH = getDrawable(R.drawable.bg_camo).getIntrinsicHeight();
         Log.i(TAG, "Min" + minW + "*" + minH);
@@ -125,7 +133,26 @@ public class EditMyNavbarService extends AccessibilityService {
             px--;
         }*/
 
-        return navbarImage;
+        /*Uri uri = Uri.fromFile(new File(url + "navbarImg.png"));
+        Log.i(TAG, "Ci sono1");
+        Bitmap daAgg = null;
+        /*Log.i(TAG, "Ci sono2");
+        try {
+            Log.i(TAG, getContentResolver().toString() + " / " + uri);
+            daAgg = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            Log.i(TAG, "Ci sono3");
+        } catch (IOException e) {
+            Log.i(TAG, "Ci sono4");
+            e.printStackTrace();
+        }*/
+        Log.i(TAG, "Aggiungo ");
+        if (bmpProva != null) {
+            Log.i(TAG, "daAgg");
+            return bmpProva;
+        } else {
+            Log.i(TAG, "navbarImage");
+            return navbarImage;
+        }
     }
 
     @Override

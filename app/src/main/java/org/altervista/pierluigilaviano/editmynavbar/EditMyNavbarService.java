@@ -7,35 +7,25 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import java.io.File;
-import java.io.IOException;
 
 public class EditMyNavbarService extends AccessibilityService {
     private final static String TAG = "EditMyNavbarService";
+    private final static String SYSTEMUI_PKG_NAME = "com.android.systemui";
 
     private WindowManager wm;
     private LinearLayout mLayout;
-    private ImageView imageView;
-    private Bitmap bmpProva;
-    private DisplayMetrics displayMetrics;
-
-    private TextView txtUrl;
-    String url;
-
+    private Bitmap bmpFromIntent;
     private boolean visible;
+    private int navbarW;
+    private int navbarH;
 
     @Override
     protected void onServiceConnected() {
@@ -54,17 +44,20 @@ public class EditMyNavbarService extends AccessibilityService {
     }
 
     private void setUp() {
-        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams();
-
-        displayMetrics = new DisplayMetrics();
+        //  Obtained the display metrics
+        DisplayMetrics displayMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(displayMetrics);
-        int navbarHeight = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
 
+        //  Set the navbar's dimensions
+        navbarW = displayMetrics.widthPixels;
+        navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
+
+        //  Create the layout parameters and setting the layout
+        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams();
         lpNavView.width = WindowManager.LayoutParams.MATCH_PARENT;
-        Log.i(TAG, "navbardim " + navbarHeight + "x" + lpNavView.width);
-        lpNavView.height = navbarHeight;
+        lpNavView.height = navbarH;
         lpNavView.x = 0;
-        lpNavView.y = -navbarHeight;
+        lpNavView.y = -navbarH;
         lpNavView.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         lpNavView.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
         lpNavView.gravity = Gravity.BOTTOM;
@@ -73,121 +66,94 @@ public class EditMyNavbarService extends AccessibilityService {
         LayoutInflater inflater = LayoutInflater.from(this);
         inflater.inflate(R.layout.view_navbar, mLayout);
 
-        imageView = mLayout.findViewById(R.id.imgNavbar);
-        //imageView.setImageResource(R.drawable.debug);
-        Bitmap toAdd = getImg(displayMetrics.widthPixels, navbarHeight);
-        imageView.setImageBitmap(toAdd);
+        ImageView imgNavbar = mLayout.findViewById(R.id.imgNavbar);
+
+        Bitmap toAdd = getImg();
+        imgNavbar.setImageBitmap(toAdd);
         wm.addView(mLayout, lpNavView);
 
+        //  Setting this variable at true, it means that the navbar is visible
         visible = true;
     }
 
+    /**
+     * If the Service is started programmatically, this method will be called
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null) {
             if (intent.getParcelableExtra("image") != null) {
-                bmpProva = intent.getParcelableExtra("image");
+                bmpFromIntent = intent.getParcelableExtra("image");
             }
         }
-
         return START_NOT_STICKY;
     }
 
-    private Bitmap getImg(int width, int height) {
+    /**
+     * This method create TWO different bitmap.
+     * The first "default" bitmap is made starting from the drawable resource "bg_camo";
+     * the second one is made starting from the image previously chosen by the user.
+     * If there's any error with the rendering of the second bitmap, the first one will be shown
+     * @return the default bitmap or the custom one
+     */
+    private Bitmap getImg() {
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.bg_camo).copy(Bitmap.Config.ARGB_8888, true);
-        image.setDensity(displayMetrics.densityDpi);
-        Bitmap navbarImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        navbarImage.setDensity(displayMetrics.densityDpi);
+        Bitmap navbarImage = Bitmap.createBitmap(navbarW, navbarH, Bitmap.Config.ARGB_8888);
 
-        int minW = getDrawable(R.drawable.bg_camo).getMinimumWidth();
-        int minH = getDrawable(R.drawable.bg_camo).getMinimumHeight();
-        int intW = getDrawable(R.drawable.bg_camo).getIntrinsicWidth();
-        int intH = getDrawable(R.drawable.bg_camo).getIntrinsicHeight();
-        Log.i(TAG, "Min" + minW + "*" + minH);
-        Log.i(TAG, "Int" + intW + "*" + intH);
-        Log.i(TAG, "DIMENSIONEBITMAP->" + image.getWidth() + "*" + image.getHeight());
-        int[] pixels = new int[width*height];
+        int[] pixels = new int[navbarW * navbarH];
 
-        image.getPixels(pixels, 0, width, 0, 0, width, height);
-        navbarImage.setPixels(pixels, 0, width, 0, 0, width, height);
-        Log.i(TAG, "DIMENSION " + width + " * " + height);
-        //int n_1440 = 1440;  //width
-        //int n_145 = 145;    //height
-        //int diff = width - height;  //diff
+        image.getPixels(pixels, 0, navbarW, 0, 0, navbarW, navbarH);
+        navbarImage.setPixels(pixels, 0, navbarW, 0, 0, navbarW, navbarH);
 
-        /*for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                navbarImage.setPixel(x, y, image.getPixel(x, y));
-            }
-        }*/
-/*
-        int px = width-1;
-        for (int x = width-1; x >= 0; x--) {
-            int py = height-1;
-            for (int y = width-1; y > diff; y--) {
-                Log.i(TAG, "PUNTO->" + x + "," + y);
-                Log.i(TAG, "LO METTE IN->" + px + "," + py);
-                navbarImage.setPixel(px, py, image.getPixel(x, y));
-                py--;
-            }
-            px--;
-        }*/
-
-        /*Uri uri = Uri.fromFile(new File(url + "navbarImg.png"));
-        Log.i(TAG, "Ci sono1");
-        Bitmap daAgg = null;
-        /*Log.i(TAG, "Ci sono2");
-        try {
-            Log.i(TAG, getContentResolver().toString() + " / " + uri);
-            daAgg = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            Log.i(TAG, "Ci sono3");
-        } catch (IOException e) {
-            Log.i(TAG, "Ci sono4");
-            e.printStackTrace();
-        }*/
-        Log.i(TAG, "Aggiungo ");
-        if (bmpProva != null) {
-            Log.i(TAG, "daAgg");
-            return bmpProva;
-        } else {
-            Log.i(TAG, "navbarImage");
-            return navbarImage;
-        }
+        //  This is not a stupid thing.
+        //  If bmpProva is null (i.e. nothing comes with the intent) it shows a default image
+        return (bmpFromIntent != null) ? bmpFromIntent : navbarImage;
     }
 
+    /**
+     * The service's main core
+     * @param accessibilityEvent the event that wakes up EditMyNavbarService
+     */
     @Override
     public void onAccessibilityEvent(AccessibilityEvent accessibilityEvent) {
-        CharSequence appName = getAppName(accessibilityEvent);
-        if (appName != null) {
-            Log.i(TAG, "Entrato in " + appName);
-            Log.i(TAG, "VALORI->" + appName + " " + visible);
-            if (appName.equals("UI sistema") && visible) {
+        CharSequence appPackage = getAppPackage(accessibilityEvent);
+        if (appPackage != null) {
+            boolean isSystemUI = appPackage.equals(SYSTEMUI_PKG_NAME);
+            if (isSystemUI && visible) {
                 onInterrupt();
                 visible = false;
-            } else if (!appName.equals("UI sistema") && !visible) {
+            } else if (!isSystemUI && !visible) {
                 onServiceConnected();
             }
         }
     }
 
-    private CharSequence getAppName(AccessibilityEvent event) {
-        CharSequence appName = null;
+    /**
+     * This method returns the package value of the app running in the foreground
+     * @param event the event that wakes up EditMyNavbarService
+     * @return appPackage is the package value
+     */
+    private CharSequence getAppPackage(AccessibilityEvent event) {
         PackageManager pm = getPackageManager();
-
+        CharSequence appPackage = null;
+        ApplicationInfo appInfo;
         if (event != null && !TextUtils.isEmpty(event.getPackageName())) {
             try {
-                ApplicationInfo appInfo = pm.getApplicationInfo(event.getPackageName().toString(), 0);
+                appInfo = pm.getApplicationInfo(event.getPackageName().toString(), 0);
                 if (appInfo != null) {
-                    appName = pm.getApplicationLabel(appInfo);
+                    appPackage = appInfo.packageName;
                 }
             } catch (PackageManager.NameNotFoundException e) {
                 e.printStackTrace();
             }
         }
 
-        return appName;
+        return appPackage;
     }
 
+    /**
+     * If the service is interrupted, the view is removed
+     */
     @Override
     public void onInterrupt() {
         if (mLayout != null && mLayout.getWindowToken() != null) {

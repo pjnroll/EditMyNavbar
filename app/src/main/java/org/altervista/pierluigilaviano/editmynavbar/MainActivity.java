@@ -15,7 +15,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
+    private final static String TAG = "MainActivity";
 
     private final int OVERLAY_PERMISSION_REQ_CODE = 1234;
     private final int GALLERY_REQ_CODE = 425;
@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
     private Switch swcActivate;
     private TextView tvAllowSystemAlertWindow;
-    private Button btnChooseImage;
-    private TextView txtBitmapPath;
 
     WindowManager wm;
     DisplayMetrics displayMetrics;
@@ -55,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         wm.getDefaultDisplay().getMetrics(displayMetrics);
 
         imageView = findViewById(R.id.imageView);
-        txtBitmapPath = findViewById(R.id.txtBitmapPath);
 
         // Seek Settings.ACTION_MANAGE_OVERLAY_PERMISSION - required on Marshmallow & above
         swcActivate = findViewById(R.id.switch1);
@@ -78,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        btnChooseImage = findViewById(R.id.btn_choose_image);
+        Button btnChooseImage = findViewById(R.id.btn_choose_image);
         btnChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -134,34 +131,39 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == CROP_REQ_CODE) {
             if (data != null) {
                 Bundle bundle = data.getExtras();
+                assert bundle != null;
                 Bitmap bitmap = bundle.getParcelable("data");
                 imageView.setImageBitmap(bitmap);
                 Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
                 bitmapIntent.putExtra("image", bitmap);
                 startService(bitmapIntent);
-                /*String bitmapPath = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, "navbarImg.png", "IMG NAVBAR");
-                txtBitmapPath.setText(bitmapPath);*/
             }
         }
     }
 
+    /**
+     * Here the magic happens
+     */
     private void cropImage() {
         try {
             Intent cropIntent;
             cropIntent = new Intent("com.android.camera.action.CROP");
             cropIntent.setDataAndType(uri, "image/*");
 
+            int navbarW = displayMetrics.widthPixels;
+            int navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
+
             cropIntent.putExtra("crop", "true");
             cropIntent.putExtra("outputX", displayMetrics.widthPixels);
             cropIntent.putExtra("outputY", getResources().getDimensionPixelSize(R.dimen.nav_bar_size));
-            //cropIntent.putExtra("aspectX", 3);
-            //cropIntent.putExtra("aspectY", 4);
+            cropIntent.putExtra("aspectX", navbarW);
+            cropIntent.putExtra("aspectY", navbarH);
             cropIntent.putExtra("scaleUpIfNeeded", true);
             cropIntent.putExtra("return-data", true);
 
             startActivityForResult(cropIntent, CROP_REQ_CODE);
         } catch (ActivityNotFoundException ex) {
-
+            //  LOL
         }
     }
 }

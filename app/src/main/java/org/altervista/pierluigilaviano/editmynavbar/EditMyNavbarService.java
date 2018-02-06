@@ -159,5 +159,6 @@ public class EditMyNavbarService extends AccessibilityService {
         if (mLayout != null && mLayout.getWindowToken() != null) {
             wm.removeView(mLayout);
         }
+        //  No edit, it's just a joke
     }
 }

@@ -163,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
 
             startActivityForResult(cropIntent, CROP_REQ_CODE);
         } catch (ActivityNotFoundException ex) {
-            //  LOL
+            Toast.makeText(this, "L'applicazione non supporta le modifiche. Sceglierne un'altra", Toast.LENGTH_SHORT).show();
         }
     }
 }

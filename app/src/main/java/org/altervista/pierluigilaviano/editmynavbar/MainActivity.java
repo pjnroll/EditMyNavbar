@@ -44,7 +44,6 @@ import static java.lang.Math.abs;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
-    public static final int TRANS_HEIGHT = 15;
 
     private final int OVERLAY_PERMISSION_REQ_CODE = 1234;
     private final int GALLERY_REQ_CODE = 425;
@@ -60,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int navbarW;
     private int navbarH;
+    private int TRANS_HEIGHT;
 
 
     private Uri uri;
@@ -78,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
         navbarW = displayMetrics.widthPixels;
         navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
+        TRANS_HEIGHT = navbarH*5/100;
 
         imageView = findViewById(R.id.imageView);
 
@@ -200,13 +201,22 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap setTransparency(Bitmap bitmap) {
         Bitmap bitmap2 = bitmap.copy(bitmap.getConfig(), true);
         Canvas canvas = new Canvas(bitmap2);
-        RectF rectF = new RectF();
-        rectF.set(0, 0, bitmap2.getWidth(), TRANS_HEIGHT);
-        Paint maCheNeSo = new Paint();
-        maCheNeSo.setColor(Color.WHITE);
-        maCheNeSo.setAlpha(200);
-        canvas.drawRect(rectF, maCheNeSo);
-        canvas.drawBitmap(bitmap, 0f, 0f, maCheNeSo);
+        RectF upRect = new RectF();
+        upRect.set(0, 0, bitmap2.getWidth(), TRANS_HEIGHT);
+        Paint alphaUp = new Paint();
+        alphaUp.setColor(Color.WHITE);
+        alphaUp.setAlpha(215);
+        canvas.drawRect(upRect, alphaUp);
+        canvas.drawBitmap(bitmap, 0f, 0f, alphaUp);
+
+        Canvas canvasDn = new Canvas(bitmap2);
+        RectF dnRect = new RectF();
+        dnRect.set(0, TRANS_HEIGHT, bitmap2.getWidth(), navbarH);
+        Paint alphaDn = new Paint();
+        alphaDn.setColor(Color.WHITE);
+        alphaDn.setAlpha(15);
+        canvasDn.drawRect(dnRect, alphaDn);
+        canvasDn.drawBitmap(bitmap2, 0f, 0f, alphaDn);
 
         return bitmap2;
         /*bitmap2.setHasAlpha(false);

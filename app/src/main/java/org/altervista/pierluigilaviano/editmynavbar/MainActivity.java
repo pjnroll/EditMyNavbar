@@ -7,16 +7,22 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.ColorInt;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -34,8 +40,11 @@ import java.io.OutputStream;
 
 import eu.janmuller.android.simplecropimage.CropImage;
 
+import static java.lang.Math.abs;
+
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
+    public static final int TRANS_HEIGHT = 15;
 
     private final int OVERLAY_PERMISSION_REQ_CODE = 1234;
     private final int GALLERY_REQ_CODE = 425;
@@ -48,6 +57,10 @@ public class MainActivity extends AppCompatActivity {
     WindowManager wm;
     DisplayMetrics displayMetrics;
     File mFileTemp;
+
+    private int navbarW;
+    private int navbarH;
+
 
     private Uri uri;
 
@@ -62,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         wm = (WindowManager)getSystemService(WINDOW_SERVICE);
         displayMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(displayMetrics);
+
+        navbarW = displayMetrics.widthPixels;
+        navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
 
         imageView = findViewById(R.id.imageView);
 
@@ -125,64 +141,122 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if (canShowOverlays()) {
-                granted = true;
-                tvAllowSystemAlertWindow.setText(getResources()
-                        .getString(R.string.text_permission_granted_restart_service));
-            } else {
-                granted = false;
-                Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-            }
-        } else if (requestCode == GALLERY_REQ_CODE) {
-            //  old code
-            /*if (data != null) {
-                uri = data.getData();
-                cropImage();
-            }*/
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK) {
+            if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+                if (canShowOverlays()) {
+                    granted = true;
+                    tvAllowSystemAlertWindow.setText(getResources()
+                            .getString(R.string.text_permission_granted_restart_service));
+                } else {
+                    granted = false;
+                    Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                }
+            } else if (requestCode == GALLERY_REQ_CODE) {
+                //  old code
+                /*if (data != null) {
+                    uri = data.getData();
+                    cropImage();
+                }*/
 
-            mFileTemp = new File(getFilesDir(), "temp_photo.png");
-            try {
-                InputStream inputStream = getContentResolver().openInputStream(data.getData());
-                FileOutputStream fileOutputStream = new FileOutputStream(mFileTemp);
-                copyStream(inputStream, fileOutputStream);
-                fileOutputStream.close();
-                assert inputStream != null;
-                inputStream.close();
+                mFileTemp = new File(getFilesDir(), "temp_photo.png");
+                try {
+                    InputStream inputStream = getContentResolver().openInputStream(data.getData());
+                    FileOutputStream fileOutputStream = new FileOutputStream(mFileTemp);
+                    copyStream(inputStream, fileOutputStream);
+                    fileOutputStream.close();
+                    assert inputStream != null;
+                    inputStream.close();
 
-                startCropImage();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } /*else if (requestCode == CROP_REQ_CODE) {
-            if (data != null) {
-                Bundle bundle = data.getExtras();
-                assert bundle != null;
-                Bitmap bitmap = bundle.getParcelable("data");
-                imageView.setImageBitmap(bitmap);
+                    startCropImage();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } /*else if (requestCode == CROP_REQ_CODE) {
+                if (data != null) {
+                    Bundle bundle = data.getExtras();
+                    assert bundle != null;
+                    Bitmap bitmap = bundle.getParcelable("data");
+                    imageView.setImageBitmap(bitmap);
+                    Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
+                    bitmapIntent.putExtra("image", bitmap);
+                    startService(bitmapIntent);
+                }*/ else if (requestCode == 0x3) {
+                String path = data.getStringExtra(CropImage.IMAGE_PATH);
+                if (path == null) {
+                    return;
+                }
+                Bitmap bitmap;
+                bitmap = BitmapFactory.decodeFile(mFileTemp.getPath());
+                Bitmap bitmap2 = setTransparency(bitmap);
+                imageView.setImageBitmap(bitmap2);
                 Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
-                bitmapIntent.putExtra("image", bitmap);
+                bitmapIntent.putExtra("image", bitmap2);
                 startService(bitmapIntent);
-            }*/
-        else if (requestCode == 0x3) {
-            String path = data.getStringExtra(CropImage.IMAGE_PATH);
-            if (path == null) {
-
-                return;
             }
-            Bitmap bitmap;
-            bitmap = BitmapFactory.decodeFile(mFileTemp.getPath());
-            imageView.setImageBitmap(bitmap);
-            Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
-            bitmapIntent.putExtra("image", bitmap);
-            startService(bitmapIntent);
         }
     }
 
-    private void startCropImage() {
-        int navbarW = displayMetrics.widthPixels;
-        int navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
+    private Bitmap setTransparency(Bitmap bitmap) {
+        Bitmap bitmap2 = bitmap.copy(bitmap.getConfig(), true);
+        Canvas canvas = new Canvas(bitmap2);
+        RectF rectF = new RectF();
+        rectF.set(0, 0, bitmap2.getWidth(), TRANS_HEIGHT);
+        Paint maCheNeSo = new Paint();
+        maCheNeSo.setColor(Color.WHITE);
+        maCheNeSo.setAlpha(200);
+        canvas.drawRect(rectF, maCheNeSo);
+        canvas.drawBitmap(bitmap, 0f, 0f, maCheNeSo);
 
+        return bitmap2;
+        /*bitmap2.setHasAlpha(false);
+        int w = bitmap2.getWidth();
+
+        int[] pixels = new int[w * TRANS_HEIGHT];
+        Log.i(TAG, "x" + 0 + " width" + navbarW + "bitmapW" + bitmap.getWidth());
+        try {
+            bitmap.getPixels(pixels, 0, w, 0, 0, w, TRANS_HEIGHT);
+        } catch (RuntimeException e) {
+            Toast.makeText(this, "The selection is too small", Toast.LENGTH_SHORT).show();
+        }
+//        int row = 0;
+        for (int i = 0; i < pixels.length; i++) {
+            pixels[i] = adjustAlpha(pixels[i], 0.7f);
+
+            /*if ((i+1) % w == 0)
+                row++;
+            //Log.i(TAG, "Bi=" + i + ":" + pixels[i]);
+            //pixels[i] = pixels[i] - (pixels[i] - (-30));
+            //Log.i(TAG, "Ai=" + i + ":" + pixels[i]);
+            //Log.i(TAG, "=======================================");
+            //pixels[i] = Color.argb(50, Color.valueOf(pixels[i]).red(), Color.valueOf(pixels[i]).green(), Color.valueOf(pixels[i]).blue());
+            //pixels[i] = Color.WHITE;
+        }
+
+        Log.i(TAG, bitmap.toString());
+        bitmap2.setPixels(pixels, 0, w, 0, 0, w, TRANS_HEIGHT);
+        experiment(bitmap);
+        return bitmap2;*/
+    }
+
+    @ColorInt
+    public static int adjustAlpha(@ColorInt int color, float factor) {
+        int alpha = Math.round(Color.alpha(color) * factor);
+        int red = Color.red(color);
+        int green = Color.green(color);
+        int blue = Color.blue(color);
+        return Color.argb(alpha, red, green, blue);
+    }
+
+    private void experiment(Bitmap bitmap) {
+        Bitmap bitmap2 = bitmap.copy(bitmap.getConfig(), true);
+        bitmap2.setPixel(0,0, Color.BLACK);
+        Log.i(TAG, "COLOR/BLACK->" + Color.BLACK);
+        bitmap2.setPixel(0,0, Color.WHITE);
+        Log.i(TAG, "COLOR/WHITE->" + Color.WHITE);
+    }
+
+    private void startCropImage() {
         Intent intent = new Intent(this, CropImage.class);
         intent.putExtra(CropImage.IMAGE_PATH, mFileTemp.getPath());
         intent.putExtra(CropImage.SCALE, true);
@@ -194,7 +268,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void copyStream(InputStream input, OutputStream output) throws IOException {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[2048];
         int bytesRead;
         while ((bytesRead = input.read(buffer)) != -1) {
             output.write(buffer, 0, bytesRead);

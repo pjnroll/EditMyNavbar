@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
@@ -107,6 +108,9 @@ public class EditMyNavbarService extends AccessibilityService {
 
         //  This is not a stupid thing.
         //  If bmpProva is null (i.e. nothing comes with the intent) it shows a default image
+        boolean newBitmap = bmpFromIntent != null;
+
+        Log.i(TAG, "New?->" + newBitmap);
         return (bmpFromIntent != null) ? bmpFromIntent : navbarImage;
     }
 

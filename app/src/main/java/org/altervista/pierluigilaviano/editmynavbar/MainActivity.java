@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         swcActivate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i(TAG, "Lo chiamo");
                 allowSystemAlertWindow();
             }
         });
@@ -119,10 +120,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
+    /*@Override
     protected void onResume() {
         super.onResume();
+        Log.i(TAG, "onResume");
+        checkGranted();
+    }*/
 
+    private void checkGranted() {
+        Log.i(TAG, "swcActivate == " + ((swcActivate == null) ? "null" : "notNull"));
+        Log.i(TAG, "granted == " + ((granted) ? "true" : "false"));
         if (swcActivate != null) {
             swcActivate.setChecked(granted);
         }
@@ -130,11 +137,13 @@ public class MainActivity extends AppCompatActivity {
 
     @TargetApi(Build.VERSION_CODES.M)
     private boolean canShowOverlays() {
+        Log.i(TAG, "------------------------------->Entrato1");
         return Settings.canDrawOverlays(this);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void allowSystemAlertWindow() {
+        Log.i(TAG, "------------------------------->Entrato1");
         Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                 Uri.parse("package:" + getPackageName()));
         startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
@@ -145,21 +154,19 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+                Log.i(TAG, "Ci siamo?");
                 if (canShowOverlays()) {
+                    Log.i(TAG, "ATTIVATO!!!");
                     granted = true;
                     tvAllowSystemAlertWindow.setText(getResources()
                             .getString(R.string.text_permission_granted_restart_service));
                 } else {
+                    Log.i(TAG, "NON ATTIVATO!!!");
                     granted = false;
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
+                checkGranted();
             } else if (requestCode == GALLERY_REQ_CODE) {
-                //  old code
-                /*if (data != null) {
-                    uri = data.getData();
-                    cropImage();
-                }*/
-
                 mFileTemp = new File(getFilesDir(), "temp_photo.png");
                 try {
                     InputStream inputStream = getContentResolver().openInputStream(data.getData());

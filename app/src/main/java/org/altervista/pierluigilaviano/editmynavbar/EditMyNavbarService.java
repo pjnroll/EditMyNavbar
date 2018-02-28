@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -53,14 +54,35 @@ public class EditMyNavbarService extends AccessibilityService {
         navbarW = displayMetrics.widthPixels;
         navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
 
+        /*lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        lpNavView.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;*/
+        int flags = 0;
+        flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        flags |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+
+
         //  Create the layout parameters and setting the layout
-        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams();
+        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams(
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, flags, -3);
         lpNavView.width = WindowManager.LayoutParams.MATCH_PARENT;
         lpNavView.height = navbarH;
         lpNavView.x = 0;
         lpNavView.y = -navbarH;
-        lpNavView.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
-        lpNavView.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.i(TAG, "OREO");
+            lpNavView.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            Log.i(TAG, "Not OREO");
+            lpNavView.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+        }
+
+
         lpNavView.gravity = Gravity.BOTTOM;
 
         mLayout = new LinearLayout(this);

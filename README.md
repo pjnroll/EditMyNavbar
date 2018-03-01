@@ -9,7 +9,7 @@
          width="35%"
          height="35%"/>
   </div>
-  <div align="center>
+  <div align="center">
     <img
          src="https://github.com/pjnroll/EditMyNavbar/blob/master/images/Screen3.png"
          width="35%"

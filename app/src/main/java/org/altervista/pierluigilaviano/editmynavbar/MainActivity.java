@@ -32,15 +32,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import eu.janmuller.android.simplecropimage.CropImage;
-
-import static java.lang.Math.abs;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -82,17 +79,16 @@ public class MainActivity extends AppCompatActivity {
 
         imageView = findViewById(R.id.imageView);
 
-        // Seek Settings.ACTION_MANAGE_OVERLAY_PERMISSION - required on Marshmallow & above
+        //  Seek Settings.ACTION_MANAGE_OVERLAY_PERMISSION - required on Marshmallow & above
         swcActivate = findViewById(R.id.switch1);
         swcActivate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG, "Lo chiamo");
                 allowSystemAlertWindow();
             }
         });
 
-        tvAllowSystemAlertWindow = (TextView) findViewById(R.id.tv_allow_system_alert_window);
+        tvAllowSystemAlertWindow = findViewById(R.id.tv_allow_system_alert_window);
 
         // Takes the user to the Accessibility Settings activity.
         // Here, you can enable/disable SublimeNavBar service

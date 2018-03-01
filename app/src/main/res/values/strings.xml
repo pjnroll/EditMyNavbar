@@ -6,7 +6,7 @@
     <string name="text_start_stop_service">Start or stop EditMyNavbar service.</string>
     <string name="text_permission_granted_restart_service">Permission granted. You should restart EditMyNavbarService now.</string>
     <string name="text_button">GO</string>
-    <string name="imgDesc">Navbar Backgroud</string>
+    <string name="imgDesc">Navbar Background</string>
     <string name="text_choose_image">Choose an image from the gallery</string>
     <string name="choose">Choose</string>
     <string name="cancel">Cancel</string>
@@ -15,4 +15,8 @@
     <string name="preparing_card">Preparing card</string>
     <string name="no_storage_card">No storage card</string>
     <string name="not_enough_space">Not enough space</string>
+    <string name="rotate_clockwise">Rotate Clockwise</string>
+    <string name="rotate_counterclockwise">Rotate CounterClockwise</string>
+    <string name="save_image">Save image</string>
+    <string name="discard_image">Discard image</string>
 </resources>

@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
@@ -50,25 +51,26 @@ public class EditMyNavbarService extends AccessibilityService {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(displayMetrics);
 
-        //  Set the navbar's dimensions
+        //  Set the NavBar dimensions
         navbarW = displayMetrics.widthPixels;
         navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
 
-        /*lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        lpNavView.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        lpNavView.flags = WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;*/
-        int flags = 0;
-        flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-        flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-        flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
-        flags |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
-
-
         //  Create the layout parameters and setting the layout
-        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams(
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY, flags, -3);
+        //  Choose the right type according to the Android Version
+        int _type = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ?
+                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+
+        //  These flags are needed in order to make it work with Oreo
+        int _flags = 0;
+        _flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        _flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+        _flags |= WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE;
+        _flags |= WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+
+        //  The Bitmap format
+        int _format = PixelFormat.TRANSLUCENT;
+
+        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams(_type, _flags, _format);
         lpNavView.width = WindowManager.LayoutParams.MATCH_PARENT;
         lpNavView.height = navbarH;
         lpNavView.x = 0;
@@ -81,7 +83,6 @@ public class EditMyNavbarService extends AccessibilityService {
             Log.i(TAG, "Not OREO");
             lpNavView.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
         }
-
 
         lpNavView.gravity = Gravity.BOTTOM;
 
@@ -120,7 +121,9 @@ public class EditMyNavbarService extends AccessibilityService {
      * @return the default bitmap or the custom one
      */
     private Bitmap getImg() {
+        //  image contains the default drawable Bitmap
         Bitmap image = BitmapFactory.decodeResource(getResources(), R.drawable.bg_camo).copy(Bitmap.Config.ARGB_8888, true);
+        //  navbarImage is the Bitmap
         Bitmap navbarImage = Bitmap.createBitmap(navbarW, navbarH, Bitmap.Config.ARGB_8888);
 
         int[] pixels = new int[navbarW * navbarH];
@@ -132,8 +135,7 @@ public class EditMyNavbarService extends AccessibilityService {
         //  If bmpProva is null (i.e. nothing comes with the intent) it shows a default image
         boolean newBitmap = bmpFromIntent != null;
 
-        Log.i(TAG, "New?->" + newBitmap);
-        return (bmpFromIntent != null) ? bmpFromIntent : navbarImage;
+        return (newBitmap) ? bmpFromIntent : navbarImage;
     }
 
     /**
@@ -185,6 +187,5 @@ public class EditMyNavbarService extends AccessibilityService {
         if (mLayout != null && mLayout.getWindowToken() != null) {
             wm.removeView(mLayout);
         }
-        //  No edit, it's just a joke
     }
 }

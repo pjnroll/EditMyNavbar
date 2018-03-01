@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/act_initialization"
+    android:id="@+id/foo_act_initialization"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -12,7 +12,7 @@
     tools:context="org.altervista.pierluigilaviano.editmynavbar.MainActivity">
 
     <LinearLayout
-        android:id="@+id/ll_allow_system_alert_window"
+        android:id="@+id/foo_ll_allow_system_alert_window"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -22,14 +22,14 @@
         android:baselineAligned="false">
 
         <TextView
-            android:id="@+id/tv_allow_system_alert_window"
+            android:id="@+id/foo_tv_allow_system_alert_window"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/text_allow_system_alert_window"
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/b_allow_system_alert_window"
+            android:id="@+id/foo_b_allow_system_alert_window"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
@@ -54,7 +54,7 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/btn_start_stop_service"
+            android:id="@+id/foo_btn_start_stop_service"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"

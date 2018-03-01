@@ -1,100 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/colorItembg">
 
-    <LinearLayout
-        android:id="@+id/ll_allow_system_alert_window"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/colorItembg"
-        android:padding="@dimen/item_padding"
-        android:baselineAligned="false">
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tbl_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <TableRow android:weightSum="10"
+        android:paddingBottom="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingStart="32dp" >
 
         <TextView
             android:id="@+id/tv_allow_system_alert_window"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="9"
             android:text="@string/text_allow_system_alert_window"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
 
         <Switch
-            android:id="@+id/switch1"
+            android:id="@+id/swc_activate_permission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"/>
+            android:layout_gravity="center_vertical|center_horizontal" />
+    </TableRow>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_start_stop_service"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/colorItembg"
-        android:layout_marginTop="@dimen/item_margin_top"
-        android:padding="@dimen/item_padding"
-        android:baselineAligned="false"
-        android:layout_below="@id/ll_allow_system_alert_window">
-
+    <TableRow android:weightSum="10"
+        android:paddingBottom="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingStart="32dp" >
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/text_start_stop_service"
-            android:textStyle="bold" />
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            android:layout_weight="9" />
 
-        <Button
-            android:id="@+id/btn_start_stop_service"
+        <Switch
+            android:id="@+id/swc_activate_service"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="@dimen/item_button_margin_top"
-            android:text="@string/text_button"/>
+            android:layout_gravity="center_vertical|center_horizontal" />
+    </TableRow>
 
-    </LinearLayout>
+    <TableRow android:weightSum="10"
+        android:paddingBottom="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="8dp"
+        android:paddingStart="32dp" >
+        <!--    Use this design to insert a text sub-menu
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="9" >
 
-    <LinearLayout
-        android:id="@+id/ll_choose_img"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@color/colorItembg"
-        android:layout_marginTop="@dimen/item_margin_top"
-        android:padding="@dimen/item_padding"
-        android:baselineAligned="false"
-        android:layout_below="@id/ll_start_stop_service">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/text_choose_image"
+                android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
+            <TextView
+                android:text="@string/lorem_ipsum"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
+        </LinearLayout> -->
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="@string/text_choose_image"
-            android:textStyle="bold" />
-
-        <Button
+            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+            android:layout_weight="9" />
+        <ImageButton
             android:id="@+id/btn_choose_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="@dimen/item_button_margin_top"
-            android:text="@string/choose"/>
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:background="@android:drawable/ic_menu_add"
+            android:contentDescription="@string/choose_image" />
 
-    </LinearLayout>
+    </TableRow>
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewPreview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ll_choose_img"
-        />
-
-    <TextView
-        android:id="@+id/txtBitmapPath"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:layout_below="@id/imageView"
-        />
-
-</RelativeLayout>
+        android:layout_gravity="center"
+        android:contentDescription="@string/preview_of_the_navbar" />
+</TableLayout>

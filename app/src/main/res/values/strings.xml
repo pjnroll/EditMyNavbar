@@ -2,7 +2,7 @@
     <string name="app_name">EditMyNavbar</string>
 
     <string name="cd_nav_bar_image">Navigation Bar image</string>
-    <string name="text_allow_system_alert_window">To get EditMyNavbar up &amp; running, you\'ll need to grant the `SYTEM_ALERT_WINDOW` permission.</string>
+    <string name="text_allow_system_alert_window">Main Switch</string>
     <string name="text_start_stop_service">Start or stop EditMyNavbar service.</string>
     <string name="text_permission_granted_restart_service">Permission granted. You should restart EditMyNavbarService now.</string>
     <string name="text_button">GO</string>
@@ -19,4 +19,7 @@
     <string name="rotate_counterclockwise">Rotate CounterClockwise</string>
     <string name="save_image">Save image</string>
     <string name="discard_image">Discard image</string>
+    <string name="preview_of_the_navbar">Preview of the Navbar</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="lorem_ipsum">lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla lorem ipsum bla</string>
 </resources>

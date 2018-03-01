@@ -26,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import eu.janmuller.android.simplecropimage.CropImage;
+import eu.janmuller.android.simplecropimage.Util;
 
 public class MainActivity extends AppCompatActivity {
     private final static String TAG = "MainActivity";
@@ -46,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
     private final int GALLERY_REQ_CODE = 425;
     private final int CROP_REQ_CODE = 2767;
 
-    private ImageView imageView;
-    private Switch swcActivate;
+    private ImageView imageViewPreview;
+    private Switch swcActivatePermission;
+    private Switch swcActivateService;
     private TextView tvAllowSystemAlertWindow;
 
     WindowManager wm;
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
 
-        wm = (WindowManager)getSystemService(WINDOW_SERVICE);
+        wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         displayMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(displayMetrics);
 
@@ -77,11 +80,13 @@ public class MainActivity extends AppCompatActivity {
         navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
         TRANS_HEIGHT = navbarH*5/100;
 
-        imageView = findViewById(R.id.imageView);
+        //  This will show the Navbar image preview
+        imageViewPreview = findViewById(R.id.imageViewPreview);
 
         //  Seek Settings.ACTION_MANAGE_OVERLAY_PERMISSION - required on Marshmallow & above
-        swcActivate = findViewById(R.id.switch1);
-        swcActivate.setOnClickListener(new View.OnClickListener() {
+        swcActivatePermission = findViewById(R.id.swc_activate_permission);
+        swcActivatePermission.setChecked(canShowOverlays());
+        swcActivatePermission.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 allowSystemAlertWindow();
@@ -90,17 +95,19 @@ public class MainActivity extends AppCompatActivity {
 
         tvAllowSystemAlertWindow = findViewById(R.id.tv_allow_system_alert_window);
 
-        // Takes the user to the Accessibility Settings activity.
-        // Here, you can enable/disable SublimeNavBar service
-        Button bStartStopService = findViewById(R.id.btn_start_stop_service);
-        bStartStopService.setOnClickListener(new View.OnClickListener() {
+        //  Takes the user to the Accessibility Settings activity.
+        //  Here, you can enable/disable EditMyNavbar service
+        //  swcActivateService = findViewById(R.id.sw)
+        swcActivateService = findViewById(R.id.swc_activate_service);
+        swcActivateService.setChecked(Utils.serviceActive);
+        swcActivateService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
             }
         });
 
-        Button btnChooseImage = findViewById(R.id.btn_choose_image);
+        ImageButton btnChooseImage = findViewById(R.id.btn_choose_image);
         btnChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,20 +123,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    /*@Override
+    @Override
     protected void onResume() {
         super.onResume();
-        Log.i(TAG, "onResume");
-        checkGranted();
-    }*/
-
-    private void checkGranted() {
-        Log.i(TAG, "swcActivate == " + ((swcActivate == null) ? "null" : "notNull"));
-        Log.i(TAG, "granted == " + ((granted) ? "true" : "false"));
-        if (swcActivate != null) {
-            swcActivate.setChecked(granted);
+        if (swcActivatePermission != null) {
+            swcActivatePermission.setChecked(canShowOverlays());
+        }
+        if (swcActivateService != null) {
+            swcActivateService.setChecked(Utils.serviceActive);
         }
     }
+
 
     @TargetApi(Build.VERSION_CODES.M)
     private boolean canShowOverlays() {
@@ -150,18 +154,14 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
             if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-                Log.i(TAG, "Ci siamo?");
                 if (canShowOverlays()) {
-                    Log.i(TAG, "ATTIVATO!!!");
                     granted = true;
                     tvAllowSystemAlertWindow.setText(getResources()
                             .getString(R.string.text_permission_granted_restart_service));
                 } else {
-                    Log.i(TAG, "NON ATTIVATO!!!");
                     granted = false;
                     Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                 }
-                checkGranted();
             } else if (requestCode == GALLERY_REQ_CODE) {
                 mFileTemp = new File(getFilesDir(), "temp_photo.png");
                 try {
@@ -193,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
                 Bitmap bitmap;
                 bitmap = BitmapFactory.decodeFile(mFileTemp.getPath());
                 Bitmap bitmap2 = setTransparency(bitmap);
-                imageView.setImageBitmap(bitmap2);
+                imageViewPreview.setImageBitmap(bitmap2);
                 Intent bitmapIntent = new Intent(this, EditMyNavbarService.class);
                 bitmapIntent.putExtra("image", bitmap2);
                 startService(bitmapIntent);

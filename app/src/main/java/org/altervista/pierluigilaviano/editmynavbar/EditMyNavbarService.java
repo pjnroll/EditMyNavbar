@@ -11,7 +11,6 @@ import android.graphics.PixelFormat;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.WindowManager;
@@ -20,7 +19,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 public class EditMyNavbarService extends AccessibilityService {
-    private final static String TAG = "EditMyNavbarService";
+    //private final static String TAG = "EditMyNavbarService";
     private final static String SYSTEMUI_PKG_NAME = "com.android.systemui";
 
     private WindowManager wm;
@@ -33,6 +32,7 @@ public class EditMyNavbarService extends AccessibilityService {
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
+        Utils.serviceActive = true;
 
         AccessibilityServiceInfo info = new AccessibilityServiceInfo();
         info.eventTypes = AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED;
@@ -51,7 +51,7 @@ public class EditMyNavbarService extends AccessibilityService {
         DisplayMetrics displayMetrics = new DisplayMetrics();
         wm.getDefaultDisplay().getMetrics(displayMetrics);
 
-        //  Set the NavBar dimensions
+        //  Set the Navbar dimensions
         navbarW = displayMetrics.widthPixels;
         navbarH = getResources().getDimensionPixelSize(R.dimen.nav_bar_size);
 
@@ -70,21 +70,13 @@ public class EditMyNavbarService extends AccessibilityService {
         //  The Bitmap format
         int _format = PixelFormat.TRANSLUCENT;
 
-        WindowManager.LayoutParams lpNavView = new WindowManager.LayoutParams(_type, _flags, _format);
-        lpNavView.width = WindowManager.LayoutParams.MATCH_PARENT;
-        lpNavView.height = navbarH;
-        lpNavView.x = 0;
-        lpNavView.y = -navbarH;
+        WindowManager.LayoutParams lpNavbarView = new WindowManager.LayoutParams(_type, _flags, _format);
+        lpNavbarView.width = WindowManager.LayoutParams.MATCH_PARENT;
+        lpNavbarView.height = navbarH;
+        lpNavbarView.x = 0;
+        lpNavbarView.y = -navbarH;
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.i(TAG, "OREO");
-            lpNavView.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            Log.i(TAG, "Not OREO");
-            lpNavView.type = WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
-        }
-
-        lpNavView.gravity = Gravity.BOTTOM;
+        lpNavbarView.gravity = Gravity.BOTTOM;
 
         mLayout = new LinearLayout(this);
         LayoutInflater inflater = LayoutInflater.from(this);
@@ -94,7 +86,7 @@ public class EditMyNavbarService extends AccessibilityService {
 
         Bitmap toAdd = getImg();
         imgNavbar.setImageBitmap(toAdd);
-        wm.addView(mLayout, lpNavView);
+        wm.addView(mLayout, lpNavbarView);
 
         //  Setting this variable at true, it means that the navbar is visible
         visible = true;
@@ -187,5 +179,6 @@ public class EditMyNavbarService extends AccessibilityService {
         if (mLayout != null && mLayout.getWindowToken() != null) {
             wm.removeView(mLayout);
         }
+        Utils.serviceActive = false;
     }
 }

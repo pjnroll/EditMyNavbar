@@ -32,6 +32,11 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -53,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
     private Switch swcActivateService;
     private TextView tvAllowSystemAlertWindow;
 
+    private AdView mAdView;
+
     WindowManager wm;
     DisplayMetrics displayMetrics;
     File mFileTemp;
@@ -71,6 +78,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout);
+
+        MobileAds.initialize(this, "ca-app-pub-7368047360674254~9946060793");
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
         displayMetrics = new DisplayMetrics();

@@ -1,93 +1,111 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/tbl_layout"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/tbl_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-    <TableRow android:weightSum="10"
-        android:paddingBottom="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingStart="32dp" >
-
-        <TextView
-            android:id="@+id/tv_allow_system_alert_window"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="9"
-            android:text="@string/text_allow_system_alert_window"
-            android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
-
-        <Switch
-            android:id="@+id/swc_activate_permission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal" />
-    </TableRow>
-
-    <TableRow android:weightSum="10"
-        android:paddingBottom="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingStart="32dp" >
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/text_start_stop_service"
-            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-            android:layout_weight="9" />
-
-        <Switch
-            android:id="@+id/swc_activate_service"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal" />
-    </TableRow>
-
-    <TableRow android:weightSum="10"
-        android:paddingBottom="8dp"
-        android:paddingEnd="8dp"
-        android:paddingTop="8dp"
-        android:paddingStart="32dp" >
-        <!--    Use this design to insert a text sub-menu
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_weight="9" >
+        <TableRow android:weightSum="10"
+            android:paddingBottom="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="32dp" >
 
             <TextView
+                android:id="@+id/tv_allow_system_alert_window"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="9"
+                android:text="@string/text_allow_system_alert_window"
+                android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
+
+            <Switch
+                android:id="@+id/swc_activate_permission"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/text_choose_image"
-                android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
-            <TextView
-                android:text="@string/lorem_ipsum"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_gravity="center_vertical|center_horizontal" />
+        </TableRow>
 
-        </LinearLayout> -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="@string/text_choose_image"
-            android:textAppearance="@style/TextAppearance.AppCompat.Menu"
-            android:layout_weight="9" />
-        <ImageButton
-            android:id="@+id/btn_choose_image"
+        <TableRow android:weightSum="10"
+            android:paddingBottom="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="32dp" >
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/text_start_stop_service"
+                android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+                android:layout_weight="9" />
+
+            <Switch
+                android:id="@+id/swc_activate_service"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal" />
+        </TableRow>
+
+        <TableRow android:weightSum="10"
+            android:paddingBottom="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="32dp" >
+            <!--    Use this design to insert a text sub-menu
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_weight="9" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/text_choose_image"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Menu" />
+                <TextView
+                    android:text="@string/lorem_ipsum"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout> -->
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/text_choose_image"
+                android:textAppearance="@style/TextAppearance.AppCompat.Menu"
+                android:layout_weight="9" />
+            <ImageButton
+                android:id="@+id/btn_choose_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:background="@android:drawable/ic_menu_add"
+                android:contentDescription="@string/choose_image" />
+
+        </TableRow>
+
+        <ImageView
+            android:id="@+id/imageViewPreview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|center_horizontal"
-            android:background="@android:drawable/ic_menu_add"
-            android:contentDescription="@string/choose_image" />
+            android:layout_gravity="center"
+            android:contentDescription="@string/preview_of_the_navbar" />
+    </TableLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/tbl_layout"
+        android:gravity="bottom|center">
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-7368047360674254/8900163318"
+            />
 
-    </TableRow>
-
-    <ImageView
-        android:id="@+id/imageViewPreview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:contentDescription="@string/preview_of_the_navbar" />
-</TableLayout>
+    </LinearLayout>
+</RelativeLayout>
